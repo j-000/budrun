@@ -1,6 +1,10 @@
 from flask import Flask
-
+from flask_sqlalchemy import SQLAlchemy
 from application.api.routes import api
+from application.site.routes import site
+
+
+db = SQLAlchemy()
 
 
 def create_app():
@@ -12,6 +16,11 @@ def create_app():
     else:
         app.config.from_object('config.DevConfig')
 
+    # Update db handle with app config
+    db.init_app(app)
+
     # Register Blueprints
     app.register_blueprint(api)
+    app.register_blueprint(site)
     return app
+
