@@ -11,12 +11,16 @@ class User(db.Model):
     email = db.Column(db.String(50), nullable=False)
     verified = db.Column(db.Boolean, default=False)
     adverts = db.relationship('Advert', backref='user', lazy=True)
+    responses = db.relationship('Reply', backref='user', lazy=True)
 
     def __init__(self, username, email):
         self.username = username
         self.email = email
         db.session.add(self)
         db.session.commit()
+
+    def __repr__(self):
+        return f'<User:{self.id}:{self.username}>'
 
     def create_advert(self, title, text, location):
         Advert(
@@ -28,9 +32,7 @@ class User(db.Model):
 
     def respond_to_advert(self, advert_id, text):
         advert = Advert.query.get(advert_id)
-        advert.respond_to_advert(text)
-
-
+        advert.respond_to_advert(text, self.id)
 
 
 class Advert(db.Model):
@@ -52,13 +54,17 @@ class Advert(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def respond_to_advert(self, text):
+    def respond_to_advert(self, text, user_id):
         message = Reply(
-            text=text
+            text=text,
+            user_id=user_id
         )
-        self.responses.add(message)
+        self.responses.append(message)
         db.session.add(self)
         db.session.commit()
+
+    def get_formatted_timestamp(self):
+        return self.timestamp.strftime("%d/%m/%Y at %H:%M:%S")
 
 
 class Reply(db.Model):
@@ -66,7 +72,10 @@ class Reply(db.Model):
     timestamp = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     advert_id = db.Column(db.Integer, db.ForeignKey('adverts.id'))
     text = db.Column(db.Text(), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    def __init__(self, text):
+    def __init__(self, text, user_id):
         self.text = text
-
+        self.user_id = user_id
+        db.session.add(self)
+        db.session.commit()
