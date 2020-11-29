@@ -1,3 +1,4 @@
+import os
 from os import environ, path
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -10,9 +11,9 @@ class Config(object):
     """Base config."""
     SECRET_KEY = environ.get('SECRET_KEY')
     SESSION_COOKIE_NAME = environ.get('SESSION_COOKIE_NAME')
-    STATIC_FOLDER = 'static'
-    TEMPLATES_FOLDER = 'templates'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    DIST_FOLDER = 'dist'
+    STATIC_FOLDER = 'dist/static'
     DEBUG = False
     JSONIFY_MIMETYPE = 'application/json'
     JSONIFY_PRETTYPRINT_REGULAR = False
