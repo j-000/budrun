@@ -1,4 +1,4 @@
-from flask import (Blueprint, jsonify, current_app)
+from flask import (Blueprint, jsonify, current_app, request)
 from application.models.models import (User, Advert)
 from application.models.serializers import (userSerializer, advertSerializer, replySerializer)
 import json
@@ -16,14 +16,20 @@ def test():
     return {'prod': 1}
 
 
-@api.route('/users')
+@api.route('/users', methods=['GET', 'POST'])
 def users():
+    if request.method == 'POST':
+        username = request.json.get('username')
+        email = request.json.get('email')
+        User(username=username, email=email)
+        return jsonify({'success': 'User registered.'})
+
     all_users = User.query.all()
     serialized_users = userSerializer.dumps(all_users, many=True)
     return jsonify(users=json.loads(serialized_users))
 
 
-@api.route('/adverts')
+@api.route('/adverts', methods=['GET'])
 def adverts():
     all_adverts = Advert.query.all()
     serialized_adverts = advertSerializer.dumps(all_adverts, many=True)
