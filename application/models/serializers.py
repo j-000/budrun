@@ -24,20 +24,23 @@ class UserSerializer(ma.SQLAlchemySchema):
 class AdvertSerializer(ma.SQLAlchemySchema):
     class Meta:
         model = Advert
-        fields = ['id', 'title', 'timestamp', 'user_id', 'text',
-                  'location', 'responses', 'url']
+        fields = ['id', 'title', 'timestamp', 'owner', 'text',
+                  'location', 'responses', 'advert_url']
     responses = ma.Function(lambda advert: {
         'count': len(advert.responses),
-        'url': url_for('api.users_advert_responses', user_id=advert.user_id, advert_id=advert.id, _external=True)
+        'url': url_for('api.advert_detail_responses', advert_id=advert.id, _external=True)
     })
-    url = ma.Function(lambda advert: url_for('site.advert_detail', advert_id=advert.id, _external=True))
+    timestamp = ma.Function(lambda advert: advert.timestamp.strftime("%d/%m/%Y at %H:%M:%S"))
+    owner = ma.Function(lambda advert: advert.user.username)
+    advert_url = ma.Function(lambda advert: url_for('api.advert_detail', advert_id=advert.id, _external=True))
 
 
 class ReplySerializer(ma.SQLAlchemySchema):
     class Meta:
         model = Reply
-        fields = ['id', 'timestamp', 'advert_id', 'text', 'user_id']
-
+        fields = ['id', 'timestamp', 'advert_id', 'text', 'user']
+    user = ma.Function(lambda response: response.user.username)
+    timestamp = ma.Function(lambda response: response.timestamp.strftime("%d/%m/%Y at %H:%M:%S"))
 
 
 

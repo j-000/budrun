@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home'
-
+import Advert from './views/Advert'
 
 
 const router = new Router({
@@ -14,6 +14,11 @@ const router = new Router({
       component:Home
     },
     {
+      path:'/advert/:advert_id',
+      name:'advert',
+      component:Advert
+    },
+    {
       path: '*',
       redirect: '/'
     }
@@ -22,5 +27,6 @@ const router = new Router({
 
 
 Vue.use(Router)
+
 
 export default router

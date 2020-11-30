@@ -1,8 +1,4 @@
-from application.models.models import User
-import pytest
-
-
-# todo: Comment tests
+from application.models.models import (User, Advert)
 
 
 def test_api_users(test_client):
@@ -35,6 +31,9 @@ def test_api_users(test_client):
     assert len(user_in_db.responses) == 0
     assert len(user_in_db.adverts) == 0
 
+    # Remove test user created
+    User.delete_user('test@email.com')
+
     # Test Edit NOT allowed
     put_response = test_client.put('/api/users', json={'fake': 'data'})
     assert put_response.status_code == 405
@@ -42,6 +41,28 @@ def test_api_users(test_client):
 
 def test_api_adverts(test_client):
     """
-    API Users should only be able to list adverts.
+    API Users should be able to list adverts and create adverts.
     """
-    pass
+    response = test_client.get('/api/adverts')
+    assert response.status_code == 200
+    assert 'adverts' in response.json
+    assert 'count' in response.json
+    ads_in_db = Advert.query.all()
+    assert response.json.get('count') == len(ads_in_db)
+    for ad in response.json.get('adverts'):
+        for field in ['id', 'title', 'timestamp',
+                       'user_id', 'text', 'location',
+                       'responses', 'url']:
+            assert field in ad
+
+    # Test Create Advert
+    response = test_client.post('/api/adverts', json={
+        'title': 'test title',
+        'text': 'test text ad',
+        'location': 'n16',
+        'email': 'test@email.com'
+    })
+    assert response.status_code == 200
+    assert response.json == {'success': 'Advert created.'}
+
+    # Clear advert from db

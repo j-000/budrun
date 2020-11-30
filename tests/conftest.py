@@ -10,3 +10,11 @@ def test_client():
     ctx.push()
     yield testing_client  # this is where the testing happens!
     ctx.pop()
+
+
+# @pytest.fixture(scope='module')
+# def db_init():
+#     db.drop_all()
+#     db.create_all()
+#     LoadFakeData()
+

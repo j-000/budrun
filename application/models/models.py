@@ -8,7 +8,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     joined = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     username = db.Column(db.String(30), nullable=False)
-    email = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False, unique=True)
     verified = db.Column(db.Boolean, default=False)
     adverts = db.relationship('Advert', backref='user', lazy=True)
     responses = db.relationship('Reply', backref='user', lazy=True)
@@ -22,6 +22,13 @@ class User(db.Model):
     def __repr__(self):
         return f'<User:{self.id}:{self.username}>'
 
+    @classmethod
+    def delete_user(cls, user_email):
+        user = cls.query.filter_by(email=user_email).first()
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+
     def create_advert(self, title, text, location):
         Advert(
             user_id=self.id,
@@ -32,7 +39,7 @@ class User(db.Model):
 
     def respond_to_advert(self, advert_id, text):
         advert = Advert.query.get(advert_id)
-        advert.respond_to_advert(text, self.id)
+        advert._respond_to_advert(text, self.id)
 
 
 class Advert(db.Model):
@@ -54,14 +61,12 @@ class Advert(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def respond_to_advert(self, text, user_id):
-        message = Reply(
+    def _respond_to_advert(self, text, user_id):
+        Reply(
             text=text,
+            advert_id=self.id,
             user_id=user_id
         )
-        self.responses.append(message)
-        db.session.add(self)
-        db.session.commit()
 
     def get_formatted_timestamp(self):
         return self.timestamp.strftime("%d/%m/%Y at %H:%M:%S")
@@ -71,11 +76,12 @@ class Reply(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     advert_id = db.Column(db.Integer, db.ForeignKey('adverts.id'))
-    text = db.Column(db.Text(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    text = db.Column(db.Text(), nullable=False)
 
-    def __init__(self, text, user_id):
+    def __init__(self, text, user_id, advert_id):
         self.text = text
         self.user_id = user_id
+        self.advert_id = advert_id
         db.session.add(self)
         db.session.commit()

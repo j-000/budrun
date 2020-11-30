@@ -4,3 +4,5 @@ __pycache__
 *.db
 frontend/node_modules
 deploy.sh
+_rewrite.py
+_load_fake_data.py
