@@ -13,6 +13,7 @@ class Config(object):
     SESSION_COOKIE_NAME = environ.get('SESSION_COOKIE_NAME')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     DIST_FOLDER = 'dist'
+    SERVER_NAME = 'http://localhost:5000'
     STATIC_FOLDER = 'dist/static'
     DEBUG = False
     JSONIFY_MIMETYPE = 'application/json'
@@ -23,7 +24,6 @@ class Config(object):
     MAX_COOKIE_SIZE = 4093
     PERMANENT_SESSION_LIFETIME = timedelta(days=31)
     PREFERRED_URL_SCHEME = 'http'
-    SERVER_NAME = None
     SESSION_COOKIE_DOMAIN = None
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = False

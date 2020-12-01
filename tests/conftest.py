@@ -1,5 +1,7 @@
 import pytest
 from tests import create_app
+from application.models.models import (User, Reply, Advert)
+import random
 
 
 @pytest.fixture(scope='module')
@@ -12,9 +14,19 @@ def test_client():
     ctx.pop()
 
 
-# @pytest.fixture(scope='module')
-# def db_init():
-#     db.drop_all()
-#     db.create_all()
-#     LoadFakeData()
+@pytest.fixture(scope='function')
+def random_user():
+    r_user = random.choice(User.query.all())
+    return r_user
 
+
+@pytest.fixture(scope='function')
+def random_reply():
+    r_reply = random.choice(Reply.query.all())
+    return r_reply
+
+
+@pytest.fixture(scope='function')
+def random_advert():
+    r_advert = random.choice(Advert.query.all())
+    return r_advert

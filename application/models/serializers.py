@@ -1,15 +1,18 @@
 from flask import url_for
 from server import ma
 from application.models.models import User, Reply, Advert
+import datetime
 
 
 class UserSerializer(ma.SQLAlchemySchema):
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'joined', 'email',
-                  'verified', 'adverts', 'user_url', 'responses']
-    joined = ma.Function(lambda user: user.joined.strftime("%d/%m/%Y at %H:%M:%S"))
+        fields = ['id', 'username', 'joined',
+                  'email', 'verified', 'adverts',
+                  'user_url', 'responses']
 
+    joined = ma.Function(lambda user: f'Joined {(datetime.datetime.today() - user.joined).days} day(s) ago.')
     adverts = ma.Function(lambda user: {
         'count': len(user.adverts),
         'url': url_for('api.user_adverts', user_id=user.id, _external=True)
